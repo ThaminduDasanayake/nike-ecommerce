@@ -22,6 +22,20 @@
       "when": 1768344773898,
       "tag": "0002_violet_secret_warriors",
       "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1768346068509,
+      "tag": "0003_fair_warbound",
+      "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1768347359444,
+      "tag": "0004_stale_manta",
+      "breakpoints": true
     }
   ]
 }

@@ -16,12 +16,6 @@ export interface CardProps {
   className?: string;
 }
 
-const toneToBg: Record<BadgeTone, string> = {
-  red: 'text-red',
-  green: 'text-green',
-  orange: 'text-orange',
-};
-
 export default function Card({
   title,
   subtitle,
