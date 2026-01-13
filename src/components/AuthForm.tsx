@@ -7,14 +7,25 @@ import { useRouter } from 'next/navigation';
 
 type Props = {
   mode: 'sign-in' | 'sign-up';
+  onSubmitAction: (formData: FormData) => Promise<{ ok: boolean; userId?: string } | void>;
 };
 
-export default function AuthForm({ mode }: Props) {
+export default function AuthForm({ mode, onSubmitAction }: Props) {
   const [show, setShow] = useState(false);
   const router = useRouter();
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+
+    const formData = new FormData(e.currentTarget);
+
+    try {
+      const result = await onSubmitAction(formData);
+
+      if (result?.ok) router.push('/');
+    } catch (e) {
+      console.log('error', e);
+    }
   };
 
   return (
