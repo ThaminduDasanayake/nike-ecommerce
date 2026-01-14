@@ -4,7 +4,7 @@ import { cookies, headers } from 'next/headers';
 import { z } from 'zod';
 import { auth } from '@/lib/auth';
 import { db } from '@/lib/db';
-import { guest } from '@/lib/db/schema';
+import { guests } from '@/lib/db/schema';
 import { and, eq, lt } from 'drizzle-orm';
 import { randomUUID } from 'crypto';
 
@@ -31,7 +31,7 @@ export async function createGuestSession() {
   const now = new Date();
   const expiresAt = new Date(now.getTime() + COOKIE_OPTIONS.maxAge * 1000);
 
-  await db.insert(guest).values({
+  await db.insert(guests).values({
     sessionToken,
     expiresAt,
   });
@@ -47,7 +47,7 @@ export async function guestSession() {
     return { sessionToken: null };
   }
   const now = new Date();
-  await db.delete(guest).where(and(eq(guest.sessionToken, token), lt(guest.expiresAt, now)));
+  await db.delete(guests).where(and(eq(guests.sessionToken, token), lt(guests.expiresAt, now)));
 
   return { sessionToken: token };
 }
@@ -131,6 +131,6 @@ async function migrateGuestToUser() {
   const token = cookieStore.get('guest_session')?.value;
   if (!token) return;
 
-  await db.delete(guest).where(eq(guest.sessionToken, token));
+  await db.delete(guests).where(eq(guests.sessionToken, token));
   cookieStore.delete('guest_session');
 }
