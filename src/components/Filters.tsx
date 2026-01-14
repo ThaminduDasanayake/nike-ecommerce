@@ -91,7 +91,7 @@ export default function Filters() {
         </button>
       </div>
 
-      <aside className="border-light-300 bg-light-100 sticky top-20 hidden h-fit min-w-60 rounded-lg border p-4 md:block">
+      <aside className="border-light-300 bg-light-100 sticky top-20 mb-6 hidden h-fit min-w-60 rounded-lg border p-4 md:block">
         <div className="mb-2 flex items-center justify-between">
           <h3 className="text-body-medium text-dark-900">Filters</h3>
           <button className="text-caption text-dark-700 underline" onClick={clearAll}>

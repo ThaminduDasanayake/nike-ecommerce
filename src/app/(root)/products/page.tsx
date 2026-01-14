@@ -33,7 +33,7 @@ export default async function ProductsPage({
   });
 
   return (
-    <main className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+    <main className="mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8">
       <header className="flex items-center justify-between py-6">
         <h1 className="text-heading-3 text-dark-900">New ({totalCount})</h1>
         <Sort />
@@ -56,26 +56,26 @@ export default async function ProductsPage({
         <Filters />
         <div>
           {products.length === 0 ? (
-            <div className="border-light-300 rounded-lg border p-8 text-center">
+            <div className="border-light-300 mx-auto mt-10 w-fit rounded-lg border p-8 text-center">
               <p className="text-body text-dark-700">No products match your filters.</p>
             </div>
           ) : (
             <div className="grid grid-cols-1 gap-6 pb-6 sm:grid-cols-2 lg:grid-cols-3">
-              {products.map((p) => {
+              {products.map(({ id, name, imageUrl, minPrice, maxPrice, subtitle }) => {
                 const price =
-                  p.minPrice !== null && p.maxPrice !== null && p.minPrice !== p.maxPrice
-                    ? `$${p.minPrice.toFixed(2)} - $${p.maxPrice.toFixed(2)}`
-                    : p.minPrice !== null
-                      ? p.minPrice
+                  minPrice !== null && maxPrice !== null && minPrice !== maxPrice
+                    ? `$${minPrice.toFixed(2)} - $${maxPrice.toFixed(2)}`
+                    : minPrice !== null
+                      ? minPrice
                       : undefined;
                 return (
                   <Card
-                    key={p.id}
-                    title={p.name}
-                    subtitle={p.subtitle ?? undefined}
-                    imageSrc={p.imageUrl ?? '/shoes/shoe-1.jpg'}
+                    key={id}
+                    title={name}
+                    subtitle={subtitle ?? undefined}
+                    imageSrc={imageUrl ?? '/shoes/shoe-1.jpg'}
                     price={price}
-                    href={`/products/${p.id}`}
+                    href={`/products/${id}`}
                   />
                 );
               })}

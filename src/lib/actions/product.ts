@@ -1,26 +1,38 @@
 'use server';
 
-import { and, asc, count, desc, eq, ilike, inArray, isNull, or, sql, type SQL } from 'drizzle-orm';
+import {
+  and,
+  asc,
+  count,
+  desc,
+  eq,
+  ilike,
+  inArray,
+  isNotNull,
+  or,
+  sql,
+  type SQL,
+} from 'drizzle-orm';
 import { db } from '@/lib/db';
 import {
   brands,
   categories,
+  colors,
   genders,
   productImages,
-  productVariants,
   products,
-  sizes,
-  colors,
-  users,
+  productVariants,
   reviews,
-  type SelectProduct,
-  type SelectVariant,
-  type SelectProductImage,
   type SelectBrand,
   type SelectCategory,
-  type SelectGender,
   type SelectColor,
+  type SelectGender,
+  type SelectProduct,
+  type SelectProductImage,
   type SelectSize,
+  type SelectVariant,
+  sizes,
+  users,
 } from '@/lib/db/schema';
 
 import { NormalizedProductFilters } from '@/lib/utils/query';
@@ -125,40 +137,59 @@ export async function getAllProducts(
     .from(productVariants)
     .where(variantConds.length ? and(...variantConds) : undefined)
     .as('v');
-  const imagesJoin = hasColor
-    ? db
-        .select({
-          productId: productImages.productId,
-          url: productImages.url,
-          rn: sql<number>`row_number() over (partition by ${productImages.productId} order by ${productImages.isPrimary} desc, ${productImages.sortOrder} asc)`.as(
-            'rn'
-          ),
-        })
-        .from(productImages)
-        .innerJoin(productVariants, eq(productVariants.id, productImages.variantId))
-        .where(
-          inArray(
-            productVariants.colorId,
-            db
-              .select({ id: colors.id })
-              .from(colors)
-              .where(inArray(colors.slug, filters.colorSlugs))
-          )
-        )
-        .as('pi')
-    : db
-        .select({
-          productId: productImages.productId,
-          url: productImages.url,
-          rn: sql<number>`row_number() over (partition by ${productImages.productId} order by ${productImages.isPrimary} desc, ${productImages.sortOrder} asc)`.as(
-            'rn'
-          ),
-        })
-        .from(productImages)
-        .where(isNull(productImages.variantId))
-        .as('pi');
 
-  const baseWhere = conds.length ? and(...conds) : undefined;
+  const imagesJoin = db
+    .select({
+      productId: productImages.productId,
+      url: productImages.url,
+      rn: sql<number>`row_number() over (partition by ${productImages.productId} order by ${productImages.isPrimary} desc, ${productImages.sortOrder} asc)`.as(
+        'rn'
+      ),
+    })
+    .from(productImages)
+    .as('pi');
+
+  // const imagesJoin = hasColor
+  //   ? db
+  //       .select({
+  //         productId: productImages.productId,
+  //         url: productImages.url,
+  //         rn: sql<number>`row_number() over (partition by ${productImages.productId} order by ${productImages.isPrimary} desc, ${productImages.sortOrder} asc)`.as(
+  //           'rn'
+  //         ),
+  //       })
+  //       .from(productImages)
+  //       .innerJoin(productVariants, eq(productVariants.id, productImages.variantId))
+  //       .where(
+  //         inArray(
+  //           productVariants.colorId,
+  //           db
+  //             .select({ id: colors.id })
+  //             .from(colors)
+  //             .where(inArray(colors.slug, filters.colorSlugs))
+  //         )
+  //       )
+  //       .as('pi')
+  //   : db
+  //       .select({
+  //         productId: productImages.productId,
+  //         url: productImages.url,
+  //         rn: sql<number>`row_number() over (partition by ${productImages.productId} order by ${productImages.isPrimary} desc, ${productImages.sortOrder} asc)`.as(
+  //           'rn'
+  //         ),
+  //       })
+  //       .from(productImages)
+  //       .where(isNull(productImages.variantId))
+  //       .as('pi');
+
+  const isFilteringVariants = hasSize || hasColor || hasPrice;
+
+  const baseWhere = and(
+    ...conds,
+    isFilteringVariants ? isNotNull(variantJoin.variantId) : undefined
+  );
+
+  // const baseWhere = conds.length ? and(...conds) : undefined;
 
   const priceAgg = {
     minPrice: sql<number | null>`min(${variantJoin.price})`,
