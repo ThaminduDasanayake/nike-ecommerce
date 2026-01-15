@@ -62,24 +62,24 @@ export async function getAllProducts(
     conds.push(or(ilike(products.name, pattern), ilike(products.description, pattern))!);
   }
 
-  if (filters.genderSlugs.length) {
+  if (filters?.genderSlugs?.length) {
     conds.push(inArray(genders.slug, filters.genderSlugs));
   }
 
-  if (filters.brandSlugs.length) {
+  if (filters?.brandSlugs?.length) {
     conds.push(inArray(brands.slug, filters.brandSlugs));
   }
 
-  if (filters.categorySlugs.length) {
+  if (filters?.categorySlugs?.length) {
     conds.push(inArray(categories.slug, filters.categorySlugs));
   }
 
-  const hasSize = filters.sizeSlugs.length > 0;
-  const hasColor = filters.colorSlugs.length > 0;
+  const hasSize = filters?.sizeSlugs?.length || 0 > 0;
+  const hasColor = filters?.colorSlugs?.length || 0 > 0;
   const hasPrice = !!(
     filters.priceMin !== undefined ||
     filters.priceMax !== undefined ||
-    filters.priceRanges.length
+    filters?.priceRanges?.length
   );
 
   const variantConds: SQL[] = [];
@@ -101,8 +101,8 @@ export async function getAllProducts(
   }
   if (hasPrice) {
     const priceBounds: SQL[] = [];
-    if (filters.priceRanges.length) {
-      for (const [min, max] of filters.priceRanges) {
+    if (filters?.priceRanges?.length) {
+      for (const [min, max] of filters?.priceRanges) {
         const subConds: SQL[] = [];
         if (min !== undefined) {
           subConds.push(sql`(${productVariants.price})::numeric >= ${min}`);

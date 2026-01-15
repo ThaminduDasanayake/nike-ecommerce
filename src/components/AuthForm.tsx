@@ -2,8 +2,8 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
-import SocialProviders from './SocialProviders';
 import { useRouter } from 'next/navigation';
+import { SocialProviders } from '@/components';
 
 type Props = {
   mode: 'sign-in' | 'sign-up';
